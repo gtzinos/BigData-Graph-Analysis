@@ -22,7 +22,7 @@ object Main {
     Much better way is to use the Graph Loader to read the edgelist file
     */
 
-    val graph = GraphLoader.edgeListFile(sc,"/home/geotzinos/Downloads/facebook_combined.txt", numEdgePartitions = 4)
+    val graph = GraphLoader.edgeListFile(sc,"./dataset/facebook_combined.txt", numEdgePartitions = 4)
 
     graph.vertices.foreach(v => println(v))
 
