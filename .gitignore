@@ -1,6 +1,10 @@
 *.class
 *.log
 
-*.idea
+target
 
-*.properties
+*.iml
+*.ipr
+*.iws
+.idea
+out
