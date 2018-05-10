@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.class
 *.log
 
@@ -54,3 +55,20 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+=======
+target
+*.class
+
+*.iml
+*.ipr
+*.iws
+.idea
+out
+
+build
+.classpath
+.project
+.settings
+org.scala-ide.sdt.core/META-INF/MANIFEST.MF
+org.scala-ide.sdt.update-site/site.xml`s
+>>>>>>> 943bee6d0459ca45c8155adace89528a1d0dbdf7
