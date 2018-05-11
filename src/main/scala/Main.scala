@@ -9,7 +9,17 @@ object Main {
 
   Logger.getLogger("org").setLevel(Level.ERROR)
   Logger.getLogger("akka").setLevel(Level.ERROR)
-  
+
+  def getCommonNeighbors(graph: Graph[Int, Int], vertexSourceId: VertexId, vertexDestId: VertexId) = {
+    val sourceNeighbors = graph.collectNeighbors(EdgeDirection.Either).filter(neightbor => neightbor._1 == vertexSourceId)
+
+    val destNeighbors = graph.collectNeighbors(EdgeDirection.Either).filter(neightbor => neightbor._1 == vertexDestId)
+
+
+    sourceNeighbors.foreach(println)
+
+  }
+
   def main(args: Array[String]): Unit = {
     val sc = new SparkContext("local", "Facebook ego net on graphx")
 
@@ -20,13 +30,25 @@ object Main {
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
 
-    graph.collectNeighbors(EdgeDirection.Either).foreach(item => {
+    graph.edges.foreach(edge => {
+      getCommonNeighbors(graph, edge.srcId, edge.dstId)
+    })
+
+  }
+}
+
+
+
+      /*
+      foreach(item => {
+       
       print(item._1)
       print(item._2.foreach(tuplas => print(tuplas)))
       println()
     }
 
       )
+*/
 
     //graph.vertices.foreach(v => println(v))
 
@@ -52,5 +74,3 @@ object Main {
     //mappedEdges.join(mappedEdges2, _2).foreach(println)
     //mappedEdges.map(edge => (edge._1, mappedEdges.filter(edgef => edgef._1 == edge._2))).collect().foreach(println)
 
-  }
-}
