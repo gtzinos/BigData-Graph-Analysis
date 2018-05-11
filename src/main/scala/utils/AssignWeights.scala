@@ -9,7 +9,7 @@ class AssignWeigts {
   def ComputeWeight(sc:SparkContext, graph: Graph[Int,Int], pr:PartitionStrategy)={
     SelectPartitionStrategy(graph,PartitionStrategy.RandomVertexCut)
     // Find the triangle count for each vertex
-    val triCounts = graph.triangleCount().vertices
+    val triCounts = graph.triangleCount()
 
     triCounts
   }

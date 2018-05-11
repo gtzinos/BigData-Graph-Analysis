@@ -13,14 +13,14 @@ object Main {
   def main(args: Array[String]): Unit = {
     val sc = new SparkContext("local", "Facebook ego net on graphx")
 
-    val DATASET_PATH="./dataset/facebook_combined.txt";
+    val DATASET_PATH="./dataset/test.txt";
 
     val importDataset = new ImportDataset()
     val aw= new AssignWeigts()
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
 
-    graph.vertices.foreach(v => println(v))
+    //graph.vertices.foreach(v => println(v))
 
     //println("Number of vertices : " + graph.vertices.count())
     //println("Number of edges : " + graph.edges.count())
@@ -29,6 +29,15 @@ object Main {
 
     val weights=aw.ComputeWeight(sc,graph,PartitionStrategy.RandomVertexCut)
 
-    weights.collect().foreach(println)
+    weights.vertices.collect().foreach(println)
+
+    val mappedEdges = graph.edges.map(edge => (edge.srcId, edge.dstId))
+    val mappedEdges2 = mappedEdges
+
+    //mappedEdges.foreach(println)
+
+    //mappedEdges.join(mappedEdges2, _2).foreach(println)
+    //mappedEdges.map(edge => (edge._1, mappedEdges.filter(edgef => edgef._1 == edge._2))).collect().foreach(println)
+
   }
 }

@@ -23,6 +23,7 @@ import org.apache.spark.sql.SparkSession
       def ImportGraph(sc: SparkContext  , filePath: String, numberEdgePartitions: Int = 4) = {
 
           GraphLoader.edgeListFile(sc, filePath, true)
+
       }
 
     }
