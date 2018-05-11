@@ -20,6 +20,14 @@ object Main {
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
 
+    graph.collectNeighbors(EdgeDirection.Either).foreach(item => {
+      print(item._1)
+      print(item._2.foreach(tuplas => print(tuplas)))
+      println()
+    }
+
+      )
+
     //graph.vertices.foreach(v => println(v))
 
     //println("Number of vertices : " + graph.vertices.count())
@@ -27,13 +35,18 @@ object Main {
     // println("Number of total triangles : "+graph.connectedComponents().triangleCount())
     // println("Triangle counts :" + graph.connectedComponents.triangleCount().vertices.collect().mkString("\n"));
 
-    val weights=aw.ComputeWeight(sc,graph,PartitionStrategy.RandomVertexCut)
+    //val weights=aw.ComputeWeight(sc,graph,PartitionStrategy.RandomVertexCut)
 
-    weights.vertices.collect().foreach(println)
+
+    //weights.vertices.collect().foreach(println)
+/*
+    weights.edges.map(f => weights.vertices.map(
+      cweights => cweights
+    )).foreach(println)
 
     val mappedEdges = graph.edges.map(edge => (edge.srcId, edge.dstId))
     val mappedEdges2 = mappedEdges
-
+*/
     //mappedEdges.foreach(println)
 
     //mappedEdges.join(mappedEdges2, _2).foreach(println)
