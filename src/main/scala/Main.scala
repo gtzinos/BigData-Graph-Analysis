@@ -1,9 +1,7 @@
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
-import org.apache.spark.graphx._
-import org.apache.spark.rdd.RDD
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.SparkConf
+import org.apache.spark.graphx._
+import org.apache.spark.sql.SparkSession
 import utils._
 
 
@@ -16,9 +14,8 @@ object Main {
     //Session configuration
     val conf = new SparkConf().set("spark.driver.maxResultSize", "8g")
     // Create the spark session first
-    val ss = SparkSession.builder().config(conf).master("local").appName("tfidfApp").getOrCreate()
+    val ss = SparkSession.builder().config(conf).master("local[8]").appName("tfidfApp").getOrCreate()
     //Import implicits
-    import ss.implicits._
     //Spark context
     val sc = ss.sparkContext
 
