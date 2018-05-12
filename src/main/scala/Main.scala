@@ -45,7 +45,9 @@ object Main {
 
     ss.createDataFrame(neighbors).createOrReplaceTempView("neighbors")
 
-    ss.sql("Select * from allEdges ae").show()
+    ss.sql("Select * from allEdges ae, neighbors ne " +
+      "where ae._1 = ne._1 or ae._2 = ne._1" +
+      "").show()
   }
 }
 
