@@ -1,9 +1,11 @@
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.{SQLContext, SparkSession}
 import utils._
+
 
 object Main {
 
@@ -11,7 +13,14 @@ object Main {
   Logger.getLogger("akka").setLevel(Level.ERROR)
 
   def main(args: Array[String]): Unit = {
-    val sc = new SparkContext("local", "Facebook ego net on graphx")
+    //Session configuration
+    val conf = new SparkConf().set("spark.driver.maxResultSize", "8g")
+    // Create the spark session first
+    val ss = SparkSession.builder().config(conf).master("local").appName("tfidfApp").getOrCreate()
+    //Import implicits
+    import ss.implicits._
+    //Spark context
+    val sc = ss.sparkContext
 
     val DATASET_PATH="./dataset/test.txt";
 
@@ -22,25 +31,9 @@ object Main {
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
 
     val allEdges = graph.edges.map(item => (item.srcId,item.dstId))
-    val neighbors = graph.collectNeighbors(EdgeDirection.Either).groupByKey().mapValues(l3 => l3.flatMap(l4=>l4.map(l5 => l5._1)))
+    val neighbors = graph.collectNeighbors(EdgeDirection.Either).groupByKey().mapValues(l3 => l3.flatMap(l4=>l4.map(l5 => l5._1):Seq[Long]).toSeq: Seq[Long])
 
     neighbors.foreach(println)
-
-    /*
-    neighbors.foreach(nei => {
-      nei._2.foreach(neiv => {
-
-        print(nei._1)
-        neiv.foreach(neivv => {
-
-          print(neivv)
-        })
-
-        println()
-      })})
-  */
-
-
 
     allEdges.foreach(println)
 
@@ -48,6 +41,11 @@ object Main {
 
     neighbors.join(allEdges).foreach(println)
 
+    ss.createDataFrame(allEdges).createOrReplaceTempView("allEdges")
+
+    ss.createDataFrame(neighbors).createOrReplaceTempView("neighbors")
+
+    ss.sql("Select * from allEdges ae").show()
   }
 }
 
@@ -74,7 +72,8 @@ object Main {
 
     //weights.vertices.collect().foreach(println)
 /*
-    weights.edges.map(f => weights.vertices.map(
+    weights.edges.map(f =>
+    weights.vertices.map(
       cweights => cweights
     )).foreach(println)
 
