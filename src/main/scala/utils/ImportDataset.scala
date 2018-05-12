@@ -20,6 +20,10 @@ import org.apache.spark.sql.SparkSession
         }
       }
 
+      def importTxt(sc: SparkContext, filePath: String) = {
+        sc.textFile(filePath)
+      }
+
       def ImportGraph(sc: SparkContext  , filePath: String, numberEdgePartitions: Int = 4) = {
 
           GraphLoader.edgeListFile(sc, filePath, true)

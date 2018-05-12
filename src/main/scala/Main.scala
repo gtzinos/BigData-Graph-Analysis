@@ -10,31 +10,23 @@ object Main {
   Logger.getLogger("org").setLevel(Level.ERROR)
   Logger.getLogger("akka").setLevel(Level.ERROR)
 
-  def getCommonNeighbors(graph: Graph[Int, Int], vertexSourceId: VertexId, vertexDestId: VertexId) = {
-    val sourceNeighbors = graph.collectNeighbors(EdgeDirection.Either).filter(neightbor => neightbor._1 == vertexSourceId)
-
-    val destNeighbors = graph.collectNeighbors(EdgeDirection.Either).filter(neightbor => neightbor._1 == vertexDestId)
-
-
-    sourceNeighbors.foreach(println)
-
-  }
-
   def main(args: Array[String]): Unit = {
     val sc = new SparkContext("local", "Facebook ego net on graphx")
 
     val DATASET_PATH="./dataset/test.txt";
 
     val importDataset = new ImportDataset()
+    val filterDataset = new FilterEdges()
     val aw= new AssignWeigts()
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
+    val edges = graph.edges
 
-    graph.edges.foreach(edge => {
-      getCommonNeighbors(graph, edge.srcId, edge.dstId)
+    edges.collect().foreach(edge => {
+      filterDataset.getCommonNeighbors(graph, edge(0), edge.toInt)
     })
 
-  }
+    }
 }
 
 
