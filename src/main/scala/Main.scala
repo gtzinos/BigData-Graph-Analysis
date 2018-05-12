@@ -20,16 +20,36 @@ object Main {
     val aw= new AssignWeigts()
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
-    val edges = graph.edges
 
-    edges.collect().foreach(edge => {
-      filterDataset.getCommonNeighbors(graph, edge(0), edge.toInt)
-    })
+    val allEdges = graph.edges.map(item => (item.srcId,item.dstId))
+    val neighbors = graph.collectNeighbors(EdgeDirection.Either).groupByKey().mapValues(l3 => l3.flatMap(l4=>l4.map(l5 => l5._1)))
 
-    }
+    neighbors.foreach(println)
+
+    /*
+    neighbors.foreach(nei => {
+      nei._2.foreach(neiv => {
+
+        print(nei._1)
+        neiv.foreach(neivv => {
+
+          print(neivv)
+        })
+
+        println()
+      })})
+  */
+
+
+
+    allEdges.foreach(println)
+
+    println()
+
+    neighbors.join(allEdges).foreach(println)
+
+  }
 }
-
-
 
       /*
       foreach(item => {
