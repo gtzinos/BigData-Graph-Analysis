@@ -30,8 +30,52 @@ object Main {
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
 
-    val allEdges = graph.edges.map(item => (item.srcId,item.dstId))
-    val neighbors = graph.collectNeighbors(EdgeDirection.Either).groupByKey().mapValues(l3 => l3.flatMap(l4=>l4.map(l5 => l5._1):Seq[Long]).toSeq: Seq[Long])
+    val allEdges = graph.edges.map(item => (item.srcId: Long,item.dstId: Long))
+
+
+    //val neighbors = graph.collectNeighbors(EdgeDirection.Either).groupByKey().mapValues(l3 => l3.flatMap(l4=>l4.map(l5 => l5._1):Seq[Long]).toSeq: Seq[Long])
+
+    val tests = importDataset.importTxt(sc, DATASET_PATH).map(item => item.split(" "))
+
+    val test1  = tests.map(item => (item(0).toLong, item(1).toLong))
+    val test2 = tests.map(item => (item(1).toLong, item(0).toLong))
+
+    val test3 = test1.groupByKey()
+    val test4 = test2.groupByKey()
+
+    val neighbors = test3.union(test4).groupByKey().mapValues(item => item.flatMap(item2 => item2))
+
+
+
+
+    neighbors.toDF().createOrReplaceTempView("neighbors")
+    allEdges.toDF().createOrReplaceTempView("allEdges")
+
+   val ralledges = allEdges.map(item => (item._2, item._1))
+
+    ss.sql("Select * " +
+      " from neighbors nei, allEdges edg"+
+      " where nei._1 = edg._1 or nei._1 = edg._2").show()
+    println("there")
+    //allEdges.join(neighbors, Seq("LeadSource","Utm_Source","Utm_Medium","Utm_Campaign")).foreach(println)
+    println("there")
+    //ralledges.join(neighbors).foreach(println)
+
+    //.map(item => (item(0), item(1))).map{ case (a, b) => (a.toLong, b.toLong) }
+
+   // test.toDF().createOrReplaceTempView("txt")
+
+
+
+
+
+    for (al <- ralledges) {
+      print("chocobloko")
+      val graphs = importDataset.ImportGraph(sc,DATASET_PATH)
+      println(graphs.triangleCount())
+    }
+
+    //.groupByKey().foreach(println)
 
     neighbors.foreach(println)
 
@@ -39,15 +83,42 @@ object Main {
 
     println()
 
-    neighbors.join(allEdges).foreach(println)
+    //neighbors.join(allEdges).foreach(println)
 
     ss.createDataFrame(allEdges).createOrReplaceTempView("allEdges")
 
     ss.createDataFrame(neighbors).createOrReplaceTempView("neighbors")
 
-    ss.sql("Select * from allEdges ae, neighbors ne " +
-      "where ae._1 = ne._1 or ae._2 = ne._1" +
-      "").show()
+   /* ss.sql("Select ae._1 as esrc , ae._2 as edest, ne._2 as nei from (" +
+      " select ae._1 as l2_esrc , ae._2 as l2_edest, ne._2 as nei" +
+      " from allEdges ae, neighbors ne " +
+      " where ae._1 = ne._1 or ae._2 = ne._1" +
+      " group by ae._1").show() */
+
+    val joined = ss.sql("Select ae._1 as esrc , ae._2 as edest, ne._2 as nei" +
+      " from allEdges ae, neighbors ne " +
+      " where ae._1 = ne._1 or ae._2 = ne._1")
+
+    //joined.groupByKey(StringToColumn("re"))//.foreach(println)
+
+    for (edge <- allEdges) {
+      graph.triplets.collect {
+        case t if t.srcId == edge._1 && t.srcId == edge._2 => t.dstId
+      }
+    }
+
+
+    /*
+
+        select e.empID, fname, lname, title, dept, projectIDCount
+        from
+        (
+          select empID, count(projectID) as projectIDCount
+          from employees E left join projects P on E.empID = P.projLeader
+        group by empID
+        ) idList
+        inner join employees e on idList.empID = e.empID
+    */
   }
 }
 

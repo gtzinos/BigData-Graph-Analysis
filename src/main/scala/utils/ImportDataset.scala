@@ -4,7 +4,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.graphx.{GraphLoader, PartitionStrategy}
 import org.apache.spark.sql.SparkSession
 
-  class ImportDataset {
+  class ImportDataset extends Serializable{
 
       def getFileName(path: String) = {
         val paths: Array[String] = path.split("/")
