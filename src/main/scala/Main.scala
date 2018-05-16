@@ -6,6 +6,8 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.{SQLContext, SparkSession}
 import utils._
 
+import scala.collection.mutable
+
 
  abstract class merger(var nei1: Long, var nei2: Array[Long], var edg1: Long, var edg2: Long) {}
 
@@ -57,17 +59,27 @@ object Main {
 
     val ralledges = allEdges.map(item => (item._2, item._1))
 
-    val merge = ss.sql("" +
+    val merge: RDD[(Long, Long, Iterable[Long], Iterable[Long])] = ss.sql("" +
       " Select DISTINCT edg._1 as sourceId, edg._2 as targetId , nei._2 as sourceNeighbors, nei2._2 as targetNeighbors" +
       " from neighbors nei, allEdges edg, neighbors nei2"+
       " where nei._1 = edg._1 and nei2._1 = edg._2"
       )
       //.createOrReplaceTempView("joinedNeighbors")
         .rdd
-        .map(row => (row(0), row(1), row(2), row(3)))
-        .foreach(println)
+        .map(row => (row(0).asInstanceOf[Long], row(1).asInstanceOf[Long], row(2).asInstanceOf[Iterable[Long]], row(3).asInstanceOf[Iterable[Long]]))
 
-    
+      val commonNeighbors = merge
+        .map(row => (row._1, row._2, row._3.filter(item => row._4.toList.contains(item))))
+
+      val weights = commonNeighbors.
+        map(row => (row._1, row._2, row._3, ((row._3.toList.length + 1) * 2) / 3))
+
+
+          weights.foreach(println)
+      //merge
+        //.map(row => (row._1, row._2, row._3.toList.intersect(row._4.toList)))
+        //.foreach(println)
+
 
 
 
