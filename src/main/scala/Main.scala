@@ -7,7 +7,11 @@ import org.apache.spark.sql.{SQLContext, SparkSession}
 import utils._
 
 
+ abstract class merger(var nei1: Long, var nei2: Array[Long], var edg1: Long, var edg2: Long) {}
+
 object Main {
+
+
 
   Logger.getLogger("org").setLevel(Level.ERROR)
   Logger.getLogger("akka").setLevel(Level.ERROR)
@@ -30,8 +34,7 @@ object Main {
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
 
-    val allEdges = graph.edges.map(item => (item.srcId: Long,item.dstId: Long))
-
+    val allEdges = graph.edges.map(item => if(item.srcId > item.dstId) (item.dstId: Long, item.srcId: Long) else (item.srcId: Long,item.dstId: Long))
 
     //val neighbors = graph.collectNeighbors(EdgeDirection.Either).groupByKey().mapValues(l3 => l3.flatMap(l4=>l4.map(l5 => l5._1):Seq[Long]).toSeq: Seq[Long])
 
@@ -43,19 +46,34 @@ object Main {
     val test3 = test1.groupByKey()
     val test4 = test2.groupByKey()
 
-    val neighbors = test3.union(test4).groupByKey().mapValues(item => item.flatMap(item2 => item2))
+    val neighbors = test3.union(test4).groupByKey().mapValues(item => item.flatten.toSeq)
 
 
-
-
+    neighbors.foreach(println)
     neighbors.toDF().createOrReplaceTempView("neighbors")
     allEdges.toDF().createOrReplaceTempView("allEdges")
 
-   val ralledges = allEdges.map(item => (item._2, item._1))
+    allEdges.foreach(println)
 
-    ss.sql("Select * " +
+    val ralledges = allEdges.map(item => (item._2, item._1))
+
+    val merge = ss.sql("" +
+      " Select DISTINCT nei._1 as ne1, nei._2 as ne2, edg._1 as edg1, edg._2 as edg2 " +
       " from neighbors nei, allEdges edg"+
-      " where nei._1 = edg._1 or nei._1 = edg._2").show()
+      " where nei._1 = edg._1 or nei._1 = edg._2")
+      .createOrReplaceTempView("merger")
+
+    ss.sql("select * from merger").show()
+
+    ss.sql("Select DISTINCT m1.edg1, m1.edg2 " +
+      " from merger m1, merger m2 " +
+      " where m1.edg1 == m2.edg1 and m1.edg2 == m2.edg2 and m1.ne2 != m2.ne2")
+      //.toDF()
+      //.map(item => (item(0), item(1)))
+      .show()
+      //.rdd
+      //.map(alsl => (alsl.get(0), alsl.get(1), alsl.get(2), alsl.get(3), alsl.get(4), alsl.get(5), alsl.get(6)))
+      //.foreach(println)
     println("there")
     //allEdges.join(neighbors, Seq("LeadSource","Utm_Source","Utm_Medium","Utm_Campaign")).foreach(println)
     println("there")
@@ -63,7 +81,7 @@ object Main {
 
     //.map(item => (item(0), item(1))).map{ case (a, b) => (a.toLong, b.toLong) }
 
-   // test.toDF().createOrReplaceTempView("txt")
+    // test.toDF().createOrReplaceTempView("txt")
 
 
 
@@ -89,11 +107,11 @@ object Main {
 
     ss.createDataFrame(neighbors).createOrReplaceTempView("neighbors")
 
-   /* ss.sql("Select ae._1 as esrc , ae._2 as edest, ne._2 as nei from (" +
-      " select ae._1 as l2_esrc , ae._2 as l2_edest, ne._2 as nei" +
-      " from allEdges ae, neighbors ne " +
-      " where ae._1 = ne._1 or ae._2 = ne._1" +
-      " group by ae._1").show() */
+    /* ss.sql("Select ae._1 as esrc , ae._2 as edest, ne._2 as nei from (" +
+       " select ae._1 as l2_esrc , ae._2 as l2_edest, ne._2 as nei" +
+       " from allEdges ae, neighbors ne " +
+       " where ae._1 = ne._1 or ae._2 = ne._1" +
+       " group by ae._1").show() */
 
     val joined = ss.sql("Select ae._1 as esrc , ae._2 as edest, ne._2 as nei" +
       " from allEdges ae, neighbors ne " +
@@ -122,28 +140,28 @@ object Main {
   }
 }
 
-      /*
-      foreach(item => {
-       
-      print(item._1)
-      print(item._2.foreach(tuplas => print(tuplas)))
-      println()
-    }
+/*
+foreach(item => {
 
-      )
+print(item._1)
+print(item._2.foreach(tuplas => print(tuplas)))
+println()
+}
+
+)
 */
 
-    //graph.vertices.foreach(v => println(v))
+//graph.vertices.foreach(v => println(v))
 
-    //println("Number of vertices : " + graph.vertices.count())
-    //println("Number of edges : " + graph.edges.count())
-    // println("Number of total triangles : "+graph.connectedComponents().triangleCount())
-    // println("Triangle counts :" + graph.connectedComponents.triangleCount().vertices.collect().mkString("\n"));
+//println("Number of vertices : " + graph.vertices.count())
+//println("Number of edges : " + graph.edges.count())
+// println("Number of total triangles : "+graph.connectedComponents().triangleCount())
+// println("Triangle counts :" + graph.connectedComponents.triangleCount().vertices.collect().mkString("\n"));
 
-    //val weights=aw.ComputeWeight(sc,graph,PartitionStrategy.RandomVertexCut)
+//val weights=aw.ComputeWeight(sc,graph,PartitionStrategy.RandomVertexCut)
 
 
-    //weights.vertices.collect().foreach(println)
+//weights.vertices.collect().foreach(println)
 /*
     weights.edges.map(f =>
     weights.vertices.map(
@@ -153,8 +171,8 @@ object Main {
     val mappedEdges = graph.edges.map(edge => (edge.srcId, edge.dstId))
     val mappedEdges2 = mappedEdges
 */
-    //mappedEdges.foreach(println)
+//mappedEdges.foreach(println)
 
-    //mappedEdges.join(mappedEdges2, _2).foreach(println)
-    //mappedEdges.map(edge => (edge._1, mappedEdges.filter(edgef => edgef._1 == edge._2))).collect().foreach(println)
+//mappedEdges.join(mappedEdges2, _2).foreach(println)
+//mappedEdges.map(edge => (edge._1, mappedEdges.filter(edgef => edgef._1 == edge._2))).collect().foreach(println)
 
