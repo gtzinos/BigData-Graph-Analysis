@@ -62,29 +62,12 @@ object Main {
       " from neighbors nei, allEdges edg, neighbors nei2"+
       " where nei._1 = edg._1 and nei2._1 = edg._2"
       )
-      .createOrReplaceTempView("joinedNeighbors")
+      //.createOrReplaceTempView("joinedNeighbors")
+        .rdd
+        .map(row => (row(0), row(1), row(2), row(3)))
+        .foreach(println)
 
-    ss.sql("select * from joinedNeighbors").show()
-
-    ss.sql("Select DISTINCT m1.edg1, m1.edg2 " +
-      " from joinedNeighbors m1, joinedNeighbors m2 " +
-      " where m1.edg1 == m2.edg1 and m1.edg2 == m2.edg2 and m1.ne2 != m2.ne2")
-      //.toDF()
-      //.map(item => (item(0), item(1)))
-      .show()
-      //.rdd
-      //.map(alsl => (alsl.get(0), alsl.get(1), alsl.get(2), alsl.get(3), alsl.get(4), alsl.get(5), alsl.get(6)))
-      //.foreach(println)
-    println("there")
-    //allEdges.join(neighbors, Seq("LeadSource","Utm_Source","Utm_Medium","Utm_Campaign")).foreach(println)
-    println("there")
-    //ralledges.join(neighbors).foreach(println)
-
-    //.map(item => (item(0), item(1))).map{ case (a, b) => (a.toLong, b.toLong) }
-
-    // test.toDF().createOrReplaceTempView("txt")
-
-
+    
 
 
 
