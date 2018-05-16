@@ -58,15 +58,16 @@ object Main {
     val ralledges = allEdges.map(item => (item._2, item._1))
 
     val merge = ss.sql("" +
-      " Select DISTINCT nei._1 as ne1, nei._2 as ne2, edg._1 as edg1, edg._2 as edg2 " +
-      " from neighbors nei, allEdges edg"+
-      " where nei._1 = edg._1 or nei._1 = edg._2")
-      .createOrReplaceTempView("merger")
+      " Select DISTINCT edg._1 as sourceId, edg._2 as targetId , nei._2 as sourceNeighbors, nei2._2 as targetNeighbors" +
+      " from neighbors nei, allEdges edg, neighbors nei2"+
+      " where nei._1 = edg._1 and nei2._1 = edg._2"
+      )
+      .createOrReplaceTempView("joinedNeighbors")
 
-    ss.sql("select * from merger").show()
+    ss.sql("select * from joinedNeighbors").show()
 
     ss.sql("Select DISTINCT m1.edg1, m1.edg2 " +
-      " from merger m1, merger m2 " +
+      " from joinedNeighbors m1, joinedNeighbors m2 " +
       " where m1.edg1 == m2.edg1 and m1.edg2 == m2.edg2 and m1.ne2 != m2.ne2")
       //.toDF()
       //.map(item => (item(0), item(1)))
