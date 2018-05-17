@@ -4,6 +4,7 @@ import org.apache.spark.sql.SparkSession
 
 class JoinEdges extends Serializable{
 
+    //Neighbors for each node
     def getNeighbors(ss: SparkSession, dataset: RDD[Array[String]]) = {
         val edges  = dataset.map(item => (item(0).toLong, item(1).toLong))
         val edgesReverted = dataset.map(item => (item(1).toLong, item(0).toLong))
@@ -23,6 +24,7 @@ class JoinEdges extends Serializable{
         sortedEdges.foreach(println)
     }
 
+    //Return common neighbors for each edge
     def getCommonNeighbors(ss: SparkSession, dataset: RDD[Array[String]]) = {
         getNeighbors(ss, dataset)
 
