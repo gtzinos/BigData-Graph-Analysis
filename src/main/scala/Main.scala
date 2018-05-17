@@ -28,8 +28,6 @@ object Main {
 
     //Import Dataset
     val importDataset = new ImportDataset()
-    val graph = importDataset.ImportGraph(sc,DATASET_PATH)
-
     //Import edges file
     val dataset = importDataset.importTxt(sc, DATASET_PATH).map(item => item.split(" "))
 
