@@ -12,75 +12,49 @@ import scala.collection.mutable
  abstract class merger(var nei1: Long, var nei2: Array[Long], var edg1: Long, var edg2: Long) {}
 
 object Main {
-
-
-
   Logger.getLogger("org").setLevel(Level.ERROR)
   Logger.getLogger("akka").setLevel(Level.ERROR)
 
   def main(args: Array[String]): Unit = {
-    //Session configuration
+    // Session configuration
     val conf = new SparkConf().set("spark.driver.maxResultSize", "8g")
     // Create the spark session first
     val ss = SparkSession.builder().config(conf).master("local").appName("tfidfApp").getOrCreate()
-    //Import implicits
+    // Import implicits
     import ss.implicits._
-    //Spark context
+    // Spark context
     val sc = ss.sparkContext
 
     val DATASET_PATH="./dataset/test.txt";
 
+    //Import Dataset
     val importDataset = new ImportDataset()
-    val filterDataset = new FilterEdges()
-    val aw= new AssignWeigts()
 
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
-
     val allEdges = graph.edges.map(item => if(item.srcId > item.dstId) (item.dstId: Long, item.srcId: Long) else (item.srcId: Long,item.dstId: Long))
-
     //val neighbors = graph.collectNeighbors(EdgeDirection.Either).groupByKey().mapValues(l3 => l3.flatMap(l4=>l4.map(l5 => l5._1):Seq[Long]).toSeq: Seq[Long])
 
-    val tests = importDataset.importTxt(sc, DATASET_PATH).map(item => item.split(" "))
-
-    val test1  = tests.map(item => (item(0).toLong, item(1).toLong))
-    val test2 = tests.map(item => (item(1).toLong, item(0).toLong))
-
-    val test3 = test1.groupByKey()
-    val test4 = test2.groupByKey()
-
-    val neighbors = test3.union(test4).groupByKey().mapValues(item => item.flatten.toSeq)
+    val dataset = importDataset.importTxt(sc, DATASET_PATH).map(item => item.split(" "))
 
 
-    neighbors.foreach(println)
-    neighbors.toDF().createOrReplaceTempView("neighbors")
-    allEdges.toDF().createOrReplaceTempView("allEdges")
+    val joinEdges = new JoinEdges()
+    val aw= new AssignWeigts()
 
-    allEdges.foreach(println)
 
-    val ralledges = allEdges.map(item => (item._2, item._1))
+    val commonNeighbors = joinEdges.getCommonNeighbors(ss, dataset, allEdges)
 
-    val merge: RDD[(Long, Long, Iterable[Long], Iterable[Long])] = ss.sql("" +
-      " Select DISTINCT edg._1 as sourceId, edg._2 as targetId , nei._2 as sourceNeighbors, nei2._2 as targetNeighbors" +
-      " from neighbors nei, allEdges edg, neighbors nei2"+
-      " where nei._1 = edg._1 and nei2._1 = edg._2"
-      )
-      //.createOrReplaceTempView("joinedNeighbors")
-        .rdd
-        .map(row => (row(0).asInstanceOf[Long], row(1).asInstanceOf[Long], row(2).asInstanceOf[Iterable[Long]], row(3).asInstanceOf[Iterable[Long]]))
-
-      val commonNeighbors = merge
-        .map(row => (row._1, row._2, row._3.filter(item => row._4.toList.contains(item))))
-
-      val weights = commonNeighbors.
+    val weights = commonNeighbors.
         map(row => (row._1, row._2, row._3, ((row._3.toList.length + 1) * 2) / 3))
 
-
-          weights.foreach(println)
+    weights.foreach(println)
       //merge
         //.map(row => (row._1, row._2, row._3.toList.intersect(row._4.toList)))
         //.foreach(println)
 
 
+
+/*
+    val ralledges = allEdges.map(item => (item._2, item._1))
 
 
     for (al <- ralledges) {
@@ -102,13 +76,13 @@ object Main {
     ss.createDataFrame(allEdges).createOrReplaceTempView("allEdges")
 
     ss.createDataFrame(neighbors).createOrReplaceTempView("neighbors")
-
+*/
     /* ss.sql("Select ae._1 as esrc , ae._2 as edest, ne._2 as nei from (" +
        " select ae._1 as l2_esrc , ae._2 as l2_edest, ne._2 as nei" +
        " from allEdges ae, neighbors ne " +
        " where ae._1 = ne._1 or ae._2 = ne._1" +
        " group by ae._1").show() */
-
+/*
     val joined = ss.sql("Select ae._1 as esrc , ae._2 as edest, ne._2 as nei" +
       " from allEdges ae, neighbors ne " +
       " where ae._1 = ne._1 or ae._2 = ne._1")
@@ -120,7 +94,7 @@ object Main {
         case t if t.srcId == edge._1 && t.srcId == edge._2 => t.dstId
       }
     }
-
+*/
 
     /*
 
