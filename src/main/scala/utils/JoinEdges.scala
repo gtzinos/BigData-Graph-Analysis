@@ -1,12 +1,10 @@
 package utils
-
-import org.apache.spark.graphx.{EdgeDirection, Graph}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 class JoinEdges extends Serializable{
 
-    def getNeighbors(ss: SparkSession, dataset: RDD[Array[String]], allEdges: RDD[(Long, Long)]) = {
+    def getNeighbors(ss: SparkSession, dataset: RDD[Array[String]]) = {
         val edges  = dataset.map(item => (item(0).toLong, item(1).toLong))
         val edgesReverted = dataset.map(item => (item(1).toLong, item(0).toLong))
 
@@ -20,12 +18,13 @@ class JoinEdges extends Serializable{
         import ss.implicits._
         neighbors.toDF().createOrReplaceTempView("neighbors")
 
-        allEdges.toDF().createOrReplaceTempView("allEdges")
-        allEdges.foreach(println)
+        val sortedEdges = edges.map(item => if(item._1 > item._2) (item._2: Long, item._1: Long) else (item._1: Long,item._2: Long))
+        sortedEdges.toDF().createOrReplaceTempView("allEdges")
+        sortedEdges.foreach(println)
     }
 
-    def getCommonNeighbors(ss: SparkSession, dataset: RDD[Array[String]], allEdges: RDD[(Long, Long)]) = {
-        getNeighbors(ss, dataset, allEdges)
+    def getCommonNeighbors(ss: SparkSession, dataset: RDD[Array[String]]) = {
+        getNeighbors(ss, dataset)
 
         val merge: RDD[(Long, Long, Iterable[Long], Iterable[Long])] = ss.sql("" +
           " Select DISTINCT edg._1 as sourceId, edg._2 as targetId , nei._2 as sourceNeighbors, nei2._2 as targetNeighbors" +

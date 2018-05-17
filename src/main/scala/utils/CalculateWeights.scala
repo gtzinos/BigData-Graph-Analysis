@@ -1,7 +1,4 @@
 package utils
-
-import org.apache.spark.SparkContext
-import org.apache.spark.graphx.{Graph, GraphLoader, PartitionStrategy}
 import org.apache.spark.rdd.RDD
 
 class AssignWeigts extends Serializable{
