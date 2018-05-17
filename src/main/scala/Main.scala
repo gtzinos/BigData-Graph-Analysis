@@ -1,15 +1,8 @@
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.SparkContext._
-import org.apache.spark.graphx._
-import org.apache.spark.rdd.RDD
+import org.apache.spark.{SparkConf}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.sql.{SparkSession}
 import utils._
 
-import scala.collection.mutable
-
-
- abstract class merger(var nei1: Long, var nei2: Array[Long], var edg1: Long, var edg2: Long) {}
 
 object Main {
   Logger.getLogger("org").setLevel(Level.ERROR)
