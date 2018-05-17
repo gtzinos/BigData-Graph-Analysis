@@ -5,7 +5,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 class JoinEdges extends Serializable{
-    
+
     def getNeighbors(ss: SparkSession, dataset: RDD[Array[String]], allEdges: RDD[(Long, Long)]) = {
         val edges  = dataset.map(item => (item(0).toLong, item(1).toLong))
         val edgesReverted = dataset.map(item => (item(1).toLong, item(0).toLong))

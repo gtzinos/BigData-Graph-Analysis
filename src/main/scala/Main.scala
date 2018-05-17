@@ -20,8 +20,7 @@ object Main {
     val conf = new SparkConf().set("spark.driver.maxResultSize", "8g")
     // Create the spark session first
     val ss = SparkSession.builder().config(conf).master("local").appName("tfidfApp").getOrCreate()
-    // Import implicits
-    import ss.implicits._
+
     // Spark context
     val sc = ss.sparkContext
 
@@ -34,15 +33,13 @@ object Main {
     val allEdges = graph.edges.map(item => if(item.srcId > item.dstId) (item.dstId: Long, item.srcId: Long) else (item.srcId: Long,item.dstId: Long))
 
     val dataset = importDataset.importTxt(sc, DATASET_PATH).map(item => item.split(" "))
-    
+
     val joinEdges = new JoinEdges()
-    val aw= new AssignWeigts()
-
-
     val commonNeighbors = joinEdges.getCommonNeighbors(ss, dataset, allEdges)
 
-    val weights = commonNeighbors.
-        map(row => (row._1, row._2, row._3, ((row._3.toList.length + 1) * 2) / 3))
+
+    val calculateWeights= new AssignWeigts()
+    val weights = calculateWeights.ComputeWeight(commonNeighbors)
 
     weights.foreach(println)
   }
