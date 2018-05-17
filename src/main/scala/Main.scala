@@ -28,16 +28,17 @@ object Main {
 
     //Import Dataset
     val importDataset = new ImportDataset()
-
     val graph = importDataset.ImportGraph(sc,DATASET_PATH)
     val allEdges = graph.edges.map(item => if(item.srcId > item.dstId) (item.dstId: Long, item.srcId: Long) else (item.srcId: Long,item.dstId: Long))
 
+    //Import edges file
     val dataset = importDataset.importTxt(sc, DATASET_PATH).map(item => item.split(" "))
 
+    //Calculate common neighbors for each node
     val joinEdges = new JoinEdges()
     val commonNeighbors = joinEdges.getCommonNeighbors(ss, dataset, allEdges)
 
-
+    //Calculate weights for each edge
     val calculateWeights= new AssignWeigts()
     val weights = calculateWeights.ComputeWeight(commonNeighbors)
 

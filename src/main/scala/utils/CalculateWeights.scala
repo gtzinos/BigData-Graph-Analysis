@@ -6,7 +6,7 @@ import org.apache.spark.rdd.RDD
 
 class AssignWeigts extends Serializable{
 
-  // Calculate the number of triangles in which a node exists
+  // Calculate the number of triangles in which pass through each edge
   def ComputeWeight(commonNeighbors: RDD[(Long, Long, Iterable[Long])])={
 
     val weights = commonNeighbors.
@@ -14,6 +14,5 @@ class AssignWeigts extends Serializable{
 
     weights
   }
-
 
 }
