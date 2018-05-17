@@ -5,29 +5,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 class JoinEdges extends Serializable{
-
-    def removeWeakEdges()  = {
-
-    }
-
-    def das2(graph: Graph[Int, Int], selectedIndex: Long) = {
-       // val sourceNeighbors = graph.collectNeighbors(EdgeDirection.Either).zipWithIndex.filter({ case (neighbor, index) => selectedIndex == index } => neighbor._1.toInt == vertexSourceId)
-
-       // val destNeighbors = graph.collectNeighbors(EdgeDirection.Either).filter(neightbor => neightbor._1 == vertexDestId)
-
-
-        //sourceNeighbors.foreach(println)
-
-       // graph.collectNeighbors(EdgeDirection.Either).foreach(ne => println(ne))
-
-    }
-
-    def calculateWeights(graph: Graph[Int, Int]) : Unit = {
-        graph.edges.foreach(edge => {
-            //  getCommonNeighbors(graph, edge.srcId.toInt, edge.dstId.toInt)
-        })
-    }
-
+    
     def getNeighbors(ss: SparkSession, dataset: RDD[Array[String]], allEdges: RDD[(Long, Long)]) = {
         val edges  = dataset.map(item => (item(0).toLong, item(1).toLong))
         val edgesReverted = dataset.map(item => (item(1).toLong, item(0).toLong))
