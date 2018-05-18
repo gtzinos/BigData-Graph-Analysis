@@ -1,6 +1,7 @@
-import org.apache.spark.{SparkConf}
+import _root_.CommunityDetection.{Louvain, LouvainConfig}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{SparkSession}
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
 import utils._
 
 
@@ -17,7 +18,7 @@ object Main {
     // Spark context
     val sc = ss.sparkContext
 
-    val DATASET_PATH="./dataset/test.txt";
+    val DATASET_PATH = "./dataset/test.txt";
 
     //Import Dataset
     val importDataset = new ImportDataset()
@@ -29,10 +30,25 @@ object Main {
     val commonNeighbors = joinEdges.getCommonNeighbors(ss, dataset)
 
     //Calculate weights for each edge
-    val calculateWeights= new AssignWeigts()
-    val weights = calculateWeights.ComputeWeight(commonNeighbors)
+    val calculateWeights = new AssignWeigts()
+    val allEdgesWithWeights = calculateWeights.ComputeWeight(commonNeighbors)
 
-    weights.foreach(println)
+    allEdgesWithWeights.foreach(println)
+
+    val edgesWithKWeights = calculateWeights.GetSubGraphWithKWeights(allEdgesWithWeights, 2)
+
+    //TODO PLOT 2 GRAPHS
+
+    val allEdgesWithoutWeights = calculateWeights.GetGraphWithDefaultWeights(allEdgesWithWeights)
+    val subEdgesWithoutWeights = calculateWeights.GetGraphWithDefaultWeights(edgesWithKWeights)
+
+    println("last step")
+    allEdgesWithoutWeights.foreach(println)
+
+    val config = LouvainConfig(50, 1)
+
+    val louvain = new Louvain()
+    louvain.run(sc, config, allEdgesWithoutWeights)
   }
 }
 

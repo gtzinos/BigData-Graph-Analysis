@@ -18,8 +18,8 @@ class AssignWeigts extends Serializable {
     edgesWithWeights.filter(edge => edge._4 >= kWeights)
   }
 
-  def GetGraphWithoutWeights(edgesWithWeights: RDD[(Long, Long, Iterable[Long], Int)]) = {
-    val withoutWeights: RDD[Edge[Long]] = edgesWithWeights.map(edge => Edge(edge._1: Long, edge._2: Long))
+  def GetGraphWithDefaultWeights(edgesWithWeights: RDD[(Long, Long, Iterable[Long], Int)]) = {
+    val withoutWeights: RDD[Edge[Long]] = edgesWithWeights.map(edge => Edge(edge._1: Long, edge._2: Long, 1L))
 
     withoutWeights
   }
