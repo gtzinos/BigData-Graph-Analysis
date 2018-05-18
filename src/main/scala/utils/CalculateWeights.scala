@@ -14,10 +14,12 @@ class AssignWeigts extends Serializable {
     weights
   }
 
+  // Returns a new subgraph, filtered by weights
   def GetSubGraphWithKWeights(edgesWithWeights: RDD[(Long, Long, Iterable[Long], Int)], kWeights: Long) = {
     edgesWithWeights.filter(edge => edge._4 >= kWeights)
   }
 
+  // Returns a new graph without neighbors
   def GetGraphWithDefaultWeights(edgesWithWeights: RDD[(Long, Long, Iterable[Long], Int)]) = {
     val withoutWeights: RDD[Edge[Long]] = edgesWithWeights.map(edge => Edge(edge._1: Long, edge._2: Long, 1L))
 

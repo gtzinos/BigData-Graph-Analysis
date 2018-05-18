@@ -1,4 +1,5 @@
 import _root_.CommunityDetection.{Louvain, LouvainConfig}
+import co.theasi.plotly.Plot
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -29,26 +30,44 @@ object Main {
     val joinEdges = new JoinEdges()
     val commonNeighbors = joinEdges.getCommonNeighbors(ss, dataset)
 
-    //Calculate weights for each edge
+    //Calculate weights for each edge based on triangles pass through each edge
     val calculateWeights = new AssignWeigts()
     val allEdgesWithWeights = calculateWeights.ComputeWeight(commonNeighbors)
 
-    allEdgesWithWeights.foreach(println)
-
+    //Filter edges by weight
     val edgesWithKWeights = calculateWeights.GetSubGraphWithKWeights(allEdgesWithWeights, 2)
 
-    //TODO PLOT 2 GRAPHS
-
+    //Remove calculated weights
     val allEdgesWithoutWeights = calculateWeights.GetGraphWithDefaultWeights(allEdgesWithWeights)
     val subEdgesWithoutWeights = calculateWeights.GetGraphWithDefaultWeights(edgesWithKWeights)
 
-    println("last step")
-    allEdgesWithoutWeights.foreach(println)
+    /*
+      Community Detection with Louvain
+    */
 
-    val config = LouvainConfig(50, 1)
+    //Create config
+    val config = LouvainConfig(1, 1)
 
+    //Execute Louvain to all edges
     val louvain = new Louvain()
-    louvain.run(sc, config, allEdgesWithoutWeights)
+    val alledgesAfterLouvain = louvain.run(sc, config, allEdgesWithoutWeights)
+
+    //Execute Louvain to sub graph
+    val louvainSub = new Louvain()
+    val subEdgesAfterLouvain = louvainSub.run(sc, config, subEdgesWithoutWeights)
+
+    /* Export data to csv */
+
+    /* Export with weights */
+    val exportData = new ExportData()
+    //Export all edges with weights
+    exportData.ExportEdgesToCsv(allEdgesWithoutWeights, true, "./exports/allEdgesWithWeights.txt")
+    //Export sub edges with k weights
+    exportData.ExportEdgesToCsv(subEdgesWithoutWeights, true, "./exports/edgesWithKWeights.txt")
+    //Export all edges after louvain
+    exportData.ExportEdgesToCsv(alledgesAfterLouvain, true, "./exports/alledgesAfterLouvain.txt")
+    //Export sub edges after louvain
+    exportData.ExportEdgesToCsv(subEdgesAfterLouvain, true, "./exports/subEdgesAfterLouvain.txt")
   }
 }
 

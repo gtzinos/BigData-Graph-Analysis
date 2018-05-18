@@ -33,13 +33,10 @@ class JoinEdges extends Serializable {
 
     val neighbors = edgesGrouped.union(edgesRevertedGrouped).groupByKey().mapValues(item => item.flatten.toSeq)
 
-    neighbors.foreach(println)
-
     import ss.implicits._
     neighbors.toDF().createOrReplaceTempView("neighbors")
 
     val sortedEdges = edges.map(item => if (item._1 > item._2) (item._2: Long, item._1: Long) else (item._1: Long, item._2: Long))
     sortedEdges.toDF().createOrReplaceTempView("allEdges")
-    sortedEdges.foreach(println)
   }
 }
