@@ -61,13 +61,13 @@ object Main {
     /* Export with weights */
     val exportData = new ExportData()
     //Export all edges with weights
-    exportData.ExportEdgesToCsv(allEdgesWithoutWeights, true, "./exports/allEdgesWithWeights.txt")
+    exportData.ExportEdgesToCsv(sc, allEdgesWithoutWeights, true, "./exports/allEdgesWithWeights.txt")
     //Export sub edges with k weights
-    exportData.ExportEdgesToCsv(subEdgesWithoutWeights, true, "./exports/edgesWithKWeights.txt")
+    exportData.ExportEdgesToCsv(sc, subEdgesWithoutWeights, true, "./exports/edgesWithKWeights.txt")
     //Export all edges after louvain
-    exportData.ExportEdgesToCsv(alledgesAfterLouvain, true, "./exports/alledgesAfterLouvain.txt")
+    exportData.ExportEdgesToCsv(sc, alledgesAfterLouvain, true, "./exports/alledgesAfterLouvain.txt")
     //Export sub edges after louvain
-    exportData.ExportEdgesToCsv(subEdgesAfterLouvain, true, "./exports/subEdgesAfterLouvain.txt")
+    exportData.ExportEdgesToCsv(sc, subEdgesAfterLouvain, true, "./exports/subEdgesAfterLouvain.txt")
   }
 }
 
