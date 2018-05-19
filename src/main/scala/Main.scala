@@ -3,6 +3,7 @@ import co.theasi.plotly.Plot
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import org.joda.time.{DateTime, DateTimeZone}
 import utils._
 
 
@@ -48,13 +49,21 @@ object Main {
     //Create config
     val config = LouvainConfig(1, 1)
 
-    //Execute Louvain to all edges
     val louvain = new Louvain()
-    val alledgesAfterLouvain = louvain.run(sc, config, allEdgesWithoutWeights)
-
-    //Execute Louvain to sub graph
     val louvainSub = new Louvain()
+
+    //Save the time for all edges
+    val allEdgesfromTimeMS = DateTime.now().getMillis()
+    //Execute Louvain to all edges
+    val alledgesAfterLouvain = louvain.run(sc, config, allEdgesWithoutWeights)
+    println("All Edges (After Louvain) : " + alledgesAfterLouvain.count() + " Edges. Time to execute: " + (DateTime.now(DateTimeZone.UTC).getMillis() - allEdgesfromTimeMS) + " ms")
+
+    //Save the time for sub graph
+    val subGraphfromTimeMS = DateTime.now().getMillis()
+    //Execute Louvain to sub graph
     val subEdgesAfterLouvain = louvainSub.run(sc, config, subEdgesWithoutWeights)
+    println("Sub Graph (After Louvain) : " + subEdgesAfterLouvain.count() + " Edges. Time to execute: " + (DateTime.now(DateTimeZone.UTC).getMillis() - subGraphfromTimeMS) + " ms")
+
 
     /* Export data to csv */
 
