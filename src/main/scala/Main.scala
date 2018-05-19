@@ -20,7 +20,7 @@ object Main {
     // Spark context
     val sc = ss.sparkContext
 
-    val DATASET_PATH = "./dataset/test.txt";
+    val DATASET_PATH = "./dataset/facebook_combined.txt";
 
     //Import Dataset
     val importDataset = new ImportDataset()
