@@ -209,11 +209,17 @@ class Louvain() extends Serializable {
         q
     })
 
-    val actualQ = newVertices.values.reduce(_ + _)
+    if(! newVertices.isEmpty()) {
+      val actualQ = newVertices.values.reduce(_ + _)
+      (actualQ, louvainGraph, count / 2)
+    }
+    else {
+      // return the modularity value of the graph along with the
+      // graph. vertices are labeled with their community
+      val actualQ = 0
+      (actualQ, louvainGraph, count / 2)
+    }
 
-    // return the modularity value of the graph along with the
-    // graph. vertices are labeled with their community
-    (actualQ, louvainGraph, count / 2)
 
   }
 

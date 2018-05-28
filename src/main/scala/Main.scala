@@ -14,12 +14,12 @@ object Main {
     // Session configuration
     val conf = new SparkConf().set("spark.driver.maxResultSize", "8g")
     // Create the spark session first
-    val ss = SparkSession.builder().config(conf).master("local").appName("tfidfApp").getOrCreate()
+    val ss = SparkSession.builder().config(conf).master("local").appName("Community Detection").getOrCreate()
 
     // Spark context
     val sc = ss.sparkContext
 
-    val DATASET_PATH = "./dataset/facebook_combined.txt";
+    val DATASET_PATH = "./dataset/test.txt";
 
     //Import Dataset
     val importDataset = new ImportDataset()
