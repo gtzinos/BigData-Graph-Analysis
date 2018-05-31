@@ -12,9 +12,10 @@ class Louvain() extends Serializable {
   def run[VD: ClassTag](sc: SparkContext, config: LouvainConfig, edgeRDD: RDD[Edge[Long]]) = {
 
     val initialGraph = Graph.fromEdges(edgeRDD, None)
-    var louvainGraph = createLouvainGraph(initialGraph)
-    println("louvenios")
-    //louvainGraph.edges.collect().foreach(println)
+    val initGraph = createLouvainGraph(initialGraph)
+
+    var louvainGraph = initGraph
+
     var compressionLevel = -1 // number of times the graph has been compressed
     var q_modularityValue = -1.0 // current modularity value
     var halt = false
@@ -52,7 +53,14 @@ class Louvain() extends Serializable {
 
     //louvainGraph.edges.collect().foreach(println)
 
-    louvainGraph.edges
+    val edgesCounter = louvainGraph.edges.count()
+
+    if (edgesCounter > 0) {
+      louvainGraph
+    }
+    else {
+      initGraph
+    }
   }
 
   /**

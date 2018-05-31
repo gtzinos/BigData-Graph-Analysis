@@ -174,8 +174,6 @@ object Louvain {
       curIter += 1
     }
 
-    louvainG.edges.collect().foreach(println)
-
     louvainG
   }
 
