@@ -26,4 +26,9 @@ class AssignWeigts extends Serializable {
     withoutWeights
   }
 
+  // Map graph weights to double
+  def mapGraphWeightsToDouble(edges: RDD[Edge[Long]]) = {
+    edges.map(edge => Edge(edge.srcId, edge.dstId, edge.attr.toDouble))
+  }
+
 }
