@@ -1,4 +1,4 @@
-package CommunityDetection
+package CommunityDetection.LouvainSimple
 
 import com.esotericsoftware.kryo.io.{Input, Output}
 import com.esotericsoftware.kryo.{Kryo, KryoSerializable}

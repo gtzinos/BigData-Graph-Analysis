@@ -1,4 +1,4 @@
-package CommunityDetection
+package CommunityDetection.LouvainSimple
 
 import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
