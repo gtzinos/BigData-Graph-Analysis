@@ -16,3 +16,7 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-hive" % sparkVersion,
   "org.apache.spark" %% "spark-graphx" % sparkVersion
 )
+
+libraryDependencies += "net.sf.opencsv" % "opencsv" % "2.3"
+
+resolvers += "Akka Repository" at "http://repo.akka.io/releases/"
