@@ -1,6 +1,9 @@
-import _root_.CommunityDetection.{Louvain, LouvainConfig}
+import CommunityDetection.LouvainSimple.{Louvain, LouvainConfig}
+import CommunityDetection.RatedLouvain.GraphUtil
+import CommunityDetection.RatedLouvain.Louvain.execute
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
+import org.apache.spark.graphx.Graph
 import org.apache.spark.sql.SparkSession
 import org.joda.time.{DateTime, DateTimeZone}
 import utils._
@@ -19,7 +22,7 @@ object Main {
     // Spark context
     val sc = ss.sparkContext
 
-    val DATASET_PATH = "./dataset/test.txt";
+    val DATASET_PATH = "./dataset/facebook_combined.txt";
 
     //Import Dataset
     val importDataset = new ImportDataset()
@@ -43,7 +46,7 @@ object Main {
 
     /*
       Community Detection with Louvain
-    */
+    
 
     //Create config
     val config = LouvainConfig(1, 1)
@@ -76,6 +79,21 @@ object Main {
     exportData.ExportEdgesToCsv(sc, alledgesAfterLouvain, true, "./exports/alledgesAfterLouvain.txt")
     //Export sub edges after louvain
     exportData.ExportEdgesToCsv(sc, subEdgesAfterLouvain, true, "./exports/subEdgesAfterLouvain.txt")
+  */
+
+
+
+    val allEdgesWithoutWeightsDouble = calculateWeights.mapGraphWeightsToDouble(allEdgesWithoutWeights)
+
+    val initialGraph:Graph[None.type,Double] = Graph.fromEdges(allEdgesWithoutWeightsDouble, None)
+    val finalGraph = execute(sc, initialGraph)
+
+
+    val exportData = new ExportData()
+    //Export all edges with weights
+    exportData.ExportGraphToCsv(sc, finalGraph, true, "./exports/allEdgesWithWeights.txt")
+
+
   }
 }
 

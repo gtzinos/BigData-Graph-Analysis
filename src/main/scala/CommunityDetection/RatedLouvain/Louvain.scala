@@ -85,6 +85,8 @@ object Louvain {
     var iterTime = 0
     var canStop = false
     while (iterTime < 100 && !canStop) {
+      print("Iteration: " + iterTime + " of 100")
+
       val neighborComm = getNeighCommInfo(G)
       val changeInfo = getChangeInfo(G,neighborComm, m)
       val changeCount = G.vertices.zip(changeInfo).filter(x=>
@@ -156,9 +158,10 @@ object Louvain {
     })
 
     louvainGraph
+
   }
 
-  def execute(sc:SparkContext, initG:Graph[None.type,Double]) {
+  def execute(sc:SparkContext, initG:Graph[None.type,Double]) = {
 
     var louvainG = GraphUtil.createLouvainGraph(initG)
     // sum of weights of all links in the network
@@ -167,6 +170,7 @@ object Louvain {
     var curIter = 0
     var res = step1(louvainG, m.value)
     while (res._2 != 0 && curIter < 20) {
+      print("Iteration: " + curIter + " res: " + res._2)
       louvainG = res._1
       louvainG = step2(louvainG)
       CommUtil.getCommunities(louvainG)
