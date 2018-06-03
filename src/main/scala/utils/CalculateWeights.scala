@@ -7,9 +7,9 @@ class AssignWeigts extends Serializable {
 
   // Calculate the number of triangles in which pass through each edge
   def ComputeWeight(commonNeighbors: RDD[(Long, Long, Iterable[Long])]) = {
-    // ((Nodes length + 2 - 1 ) * 2 ) / 3
+    // (Common nodes length == triangles )
     val weights = commonNeighbors.
-      map(row => (row._1, row._2, row._3, ((row._3.toList.length + 1) * 2) / 3))
+      map(row => (row._1, row._2, row._3, row._3.toList.length))
 
     weights
   }
@@ -24,6 +24,11 @@ class AssignWeigts extends Serializable {
     val withoutWeights: RDD[Edge[Long]] = edgesWithWeights.map(edge => Edge(edge._1: Long, edge._2: Long, 1L))
 
     withoutWeights
+  }
+
+  // Map graph weights to double
+  def mapGraphWeightsToDouble(edges: RDD[Edge[Long]]) = {
+    edges.map(edge => Edge(edge.srcId, edge.dstId, edge.attr.toDouble))
   }
 
 }

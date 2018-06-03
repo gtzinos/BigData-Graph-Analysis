@@ -1,4 +1,4 @@
-package CommunityDetection
+package CommunityDetection.LouvainSimple
 
 import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
@@ -12,9 +12,10 @@ class Louvain() extends Serializable {
   def run[VD: ClassTag](sc: SparkContext, config: LouvainConfig, edgeRDD: RDD[Edge[Long]]) = {
 
     val initialGraph = Graph.fromEdges(edgeRDD, None)
-    var louvainGraph = createLouvainGraph(initialGraph)
-    println("louvenios")
-    //louvainGraph.edges.collect().foreach(println)
+    val initGraph = createLouvainGraph(initialGraph)
+
+    var louvainGraph = initGraph
+
     var compressionLevel = -1 // number of times the graph has been compressed
     var q_modularityValue = -1.0 // current modularity value
     var halt = false
@@ -52,7 +53,14 @@ class Louvain() extends Serializable {
 
     //louvainGraph.edges.collect().foreach(println)
 
-    louvainGraph.edges
+    val edgesCounter = louvainGraph.edges.count()
+
+    if (edgesCounter > 0) {
+      louvainGraph
+    }
+    else {
+      initGraph
+    }
   }
 
   /**
@@ -209,11 +217,17 @@ class Louvain() extends Serializable {
         q
     })
 
-    val actualQ = newVertices.values.reduce(_ + _)
+    if(! newVertices.isEmpty()) {
+      val actualQ = newVertices.values.reduce(_ + _)
+      (actualQ, louvainGraph, count / 2)
+    }
+    else {
+      // return the modularity value of the graph along with the
+      // graph. vertices are labeled with their community
+      val actualQ = 0
+      (actualQ, louvainGraph, count / 2)
+    }
 
-    // return the modularity value of the graph along with the
-    // graph. vertices are labeled with their community
-    (actualQ, louvainGraph, count / 2)
 
   }
 
