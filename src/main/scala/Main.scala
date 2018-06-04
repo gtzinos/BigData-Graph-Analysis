@@ -22,7 +22,7 @@ object Main {
     // Spark context
     val sc = ss.sparkContext
 
-    val DATASET_PATH = "./dataset/facebook_combined.txt";
+    val DATASET_PATH = "./dataset/test.txt";
 
     //Import Dataset
     val importDataset = new ImportDataset()
@@ -46,7 +46,7 @@ object Main {
 
     /*
       Community Detection with Louvain
-    
+    */
 
     //Create config
     val config = LouvainConfig(1, 1)
@@ -71,6 +71,7 @@ object Main {
 
     /* Export with weights */
     val exportData = new ExportData()
+
     //Export all edges with weights
     exportData.ExportEdgesToCsv(sc, allEdgesWithoutWeights, true, "./exports/allEdgesWithWeights.txt")
     //Export sub edges with k weights
@@ -79,8 +80,6 @@ object Main {
     exportData.ExportEdgesToCsv(sc, alledgesAfterLouvain, true, "./exports/alledgesAfterLouvain.txt")
     //Export sub edges after louvain
     exportData.ExportEdgesToCsv(sc, subEdgesAfterLouvain, true, "./exports/subEdgesAfterLouvain.txt")
-  */
-
 
 
     val allEdgesWithoutWeightsDouble = calculateWeights.mapGraphWeightsToDouble(allEdgesWithoutWeights)
@@ -88,11 +87,9 @@ object Main {
     val initialGraph:Graph[None.type,Double] = Graph.fromEdges(allEdgesWithoutWeightsDouble, None)
     val finalGraph = execute(sc, initialGraph)
 
-
-    val exportData = new ExportData()
+    val exportDataNew = new ExportData()
     //Export all edges with weights
-    exportData.ExportGraphToCsv(sc, finalGraph, true, "./exports/allEdgesWithWeights.txt")
-
+    exportDataNew.ExportGraphToCsv(sc, finalGraph, true, "./exports/allEdgesWithWeights.txt")
 
   }
 }

@@ -53,14 +53,7 @@ class Louvain() extends Serializable {
 
     //louvainGraph.edges.collect().foreach(println)
 
-    val edgesCounter = louvainGraph.edges.count()
-
-    if (edgesCounter > 0) {
-      louvainGraph
-    }
-    else {
-      initGraph
-    }
+    louvainGraph.edges
   }
 
   /**
