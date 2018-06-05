@@ -38,7 +38,7 @@ object Main {
     val allEdgesWithWeights = calculateWeights.ComputeWeight(commonNeighbors)
 
     //Filter edges by weight
-    val edgesWithKWeights = calculateWeights.GetSubGraphWithKWeights(allEdgesWithWeights, 2)
+    val edgesWithKWeights = calculateWeights.GetSubGraphWithKWeights(allEdgesWithWeights, 10)
 
     //Remove calculated weights
     val allEdgesWithoutWeights = calculateWeights.GetGraphWithDefaultWeights(allEdgesWithWeights)
