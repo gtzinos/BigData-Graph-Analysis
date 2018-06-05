@@ -22,7 +22,7 @@ object Main {
     // Spark context
     val sc = ss.sparkContext
 
-    val DATASET_PATH = "./dataset/test.txt";
+    val DATASET_PATH = "./dataset/facebook_combined.txt";
 
     //Import Dataset
     val importDataset = new ImportDataset()
@@ -82,15 +82,16 @@ object Main {
     exportData.ExportEdgesToCsv(sc, subEdgesAfterLouvain, true, "./exports/subEdgesAfterLouvain.txt")
 
 
-    val allEdgesWithoutWeightsDouble = calculateWeights.mapGraphWeightsToDouble(allEdgesWithoutWeights)
+    /*
+      val allEdgesWithoutWeightsDouble = calculateWeights.mapGraphWeightsToDouble(allEdgesWithoutWeights)
 
-    val initialGraph:Graph[None.type,Double] = Graph.fromEdges(allEdgesWithoutWeightsDouble, None)
-    val finalGraph = execute(sc, initialGraph)
+      val initialGraph:Graph[None.type,Double] = Graph.fromEdges(allEdgesWithoutWeightsDouble, None)
+      val finalGraph = execute(sc, initialGraph)
 
-    val exportDataNew = new ExportData()
-    //Export all edges with weights
-    exportDataNew.ExportGraphToCsv(sc, finalGraph, true, "./exports/allEdgesWithWeights.txt")
-
+      val exportDataNew = new ExportData()
+      //Export all edges with weights
+      exportDataNew.ExportGraphToCsv(sc, finalGraph, true, "./exports/allEdgesWithWeights.txt")
+   */
   }
 }
 
