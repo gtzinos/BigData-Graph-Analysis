@@ -33,7 +33,7 @@ class Louvain() extends Serializable {
       louvainGraph.unpersistVertices(blocking = false)
       louvainGraph = currentGraph
 
-      println(s"qValue: $currentQModularityValue")
+      println(s"Modularity: $currentQModularityValue")
 
       qValues = qValues :+ ((compressionLevel, currentQModularityValue))
 
