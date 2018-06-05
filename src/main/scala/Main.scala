@@ -49,7 +49,7 @@ object Main {
     */
 
     //Create config
-    val config = LouvainConfig(2000, 1)
+    val config = LouvainConfig(5000, 1)
 
     val louvain = new Louvain()
     val louvainSub = new Louvain()
