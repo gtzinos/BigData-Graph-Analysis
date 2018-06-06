@@ -26,10 +26,15 @@ object Main {
     //Import edges file
     val dataset = importDataset.importTxt(sc, DATASET_PATH).map(item => item.split(" "))
 
+
+    val joinTime = DateTime.now().getMillis()
+
     //Calculate common neighbors for each node
     val joinEdges = new JoinEdges()
     val commonNeighbors = joinEdges.getCommonNeighbors(ss, dataset)
 
+    println("Join edges time: " +  (DateTime.now(DateTimeZone.UTC).getMillis() - joinTime) + "ms")
+    
     //Calculate weights for each edge based on triangles pass through each edge
     val calculateWeights = new AssignWeigts()
     val allEdgesWithWeights = calculateWeights.ComputeWeight(commonNeighbors)
