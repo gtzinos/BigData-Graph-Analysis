@@ -1,9 +1,6 @@
 import CommunityDetection.LouvainSimple.{Louvain, LouvainConfig}
-import CommunityDetection.RatedLouvain.GraphUtil
-import CommunityDetection.RatedLouvain.Louvain.execute
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
-import org.apache.spark.graphx.Graph
 import org.apache.spark.sql.SparkSession
 import org.joda.time.{DateTime, DateTimeZone}
 import utils._
