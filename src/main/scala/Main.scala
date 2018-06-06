@@ -80,6 +80,7 @@ object Main {
 
 
     /*
+    //Rated Louvain
       val allEdgesWithoutWeightsDouble = calculateWeights.mapGraphWeightsToDouble(allEdgesWithoutWeights)
 
       val initialGraph:Graph[None.type,Double] = Graph.fromEdges(allEdgesWithoutWeightsDouble, None)
